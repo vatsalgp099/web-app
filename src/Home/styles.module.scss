@@ -1,0 +1,31 @@
+.formWrapper {
+    padding: 20px;
+    width: 600px;
+    form {
+        display: flex;
+        flex-direction: column;
+        label {
+            margin-bottom: 6px;
+        }
+        input {
+            margin-bottom: 14px;
+            border: 1px solid #DBDFEA;
+            border-radius: 5px;
+            padding: 10px;
+            &:focus {
+                border-color: #9BA4B5;
+            }
+        }
+        button {
+            width: fit-content;
+            padding: 10px 24px;
+            margin-top: 24px;
+            margin-left: auto;
+            border-radius: 5px;
+            background-color: #2A2F4F;
+            color: #FFFFFF;
+            font-size: 16px;
+
+        }
+    }
+}
