@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 export function postRequest(endpoint, payload) {
-    const headers = {
-        "Content-Type": "application/json"
-    }
-    return axios.post(endpoint, payload, headers)
+    return axios.post(endpoint, payload)
+}
+
+export function getRequest(endpoint) {
+    return axios.get(endpoint)
+}
+
+export function deleteRequest(endpoint) {
+    return axios.delete(endpoint)
 }
