@@ -11,3 +11,7 @@ export function getRequest(endpoint) {
 export function deleteRequest(endpoint) {
     return axios.delete(endpoint)
 }
+
+export function putRequest(endpoint, payload) {
+    return axios.put(endpoint, payload)
+}

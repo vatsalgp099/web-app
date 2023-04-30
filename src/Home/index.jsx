@@ -2,14 +2,22 @@ import { useState, useEffect } from "react";
 import Modal from "../components/Modal";
 import styles from "./styles.module.scss";
 
-import { deleteRequest, getRequest, postRequest } from "../utils/requests";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "../utils/requests";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 const Home = () => {
   const [formdata, setFormdata] = useState({});
   const [serverData, setServerData] = useState([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [dataToEdit, setDataToEdit] = useState(null);
+
   const [loading, setLoading] = useState(false);
 
   function onChange(e) {
@@ -24,13 +32,40 @@ const Home = () => {
     postRequest("http://localhost:8080/info", formdata)
       .then((response) => {
         toast.success("Record Added!");
-        fetchServerData();
       })
       .catch((error) => console.log(error))
       .finally(() => {
-        setIsModalOpen(false);
-        setLoading(false);
+        setIsCreateModalOpen(false);
+        fetchServerData();
         setFormdata({});
+      });
+  }
+
+  function onChangeEditForm(e) {
+    let update = { ...dataToEdit };
+    update[e.target.name] = e.target.value;
+    setDataToEdit(update);
+  }
+
+  function onSubmitEditForm(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    const payload = {
+        "id": dataToEdit.id,
+        "name": dataToEdit.name,
+        "language": dataToEdit.language,
+        "framework": dataToEdit.framework,
+    }
+
+    putRequest(`http://localhost:8080/info/${dataToEdit.id}`, payload)
+      .then((response) => {
+        toast.success("Record Updated!");
+      })
+      .catch((err) => console.log(err))
+      .finally(() => {
+        setIsEditModalOpen(false);
+        fetchServerData()
       });
   }
 
@@ -38,7 +73,6 @@ const Home = () => {
     setLoading(true);
     getRequest("http://localhost:8080/info")
       .then((response) => {
-        console.log(response);
         setServerData(response.data);
       })
       .catch((err) => console.log(err))
@@ -72,7 +106,9 @@ const Home = () => {
         <div className={styles.tableContainer}>
           <div className={styles.header}>
             <h2>All records</h2>
-            <button onClick={() => setIsModalOpen(true)}>Create Record</button>
+            <button onClick={() => setIsCreateModalOpen(true)}>
+              Create Record
+            </button>
           </div>
           <table>
             <thead>
@@ -82,22 +118,35 @@ const Home = () => {
                 <th>language</th>
                 <th>framework</th>
                 <th>Delete Record</th>
+                <th>Edit Record</th>
               </tr>
             </thead>
             <tbody>
               {serverData.map((item) => (
-                <tr>
+                <tr key={item.id}>
                   <td>{item.id}</td>
                   <td>{item.name}</td>
                   <td>{item.language}</td>
                   <td>{item.framework}</td>
                   <td>
                     <button
+                      className={styles.delete}
                       onClick={() => {
                         deleteRecord(item.id);
                       }}
                     >
                       Delete
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className={styles.edit}
+                      onClick={() => {
+                        setDataToEdit(item);
+                        setIsEditModalOpen(true);
+                      }}
+                    >
+                      Edit
                     </button>
                   </td>
                 </tr>
@@ -107,8 +156,11 @@ const Home = () => {
         </div>
       ) : null}
 
-      {isModalOpen ? (
-        <Modal heading="Create Server" onClose={() => setIsModalOpen(false)}>
+      {isCreateModalOpen ? (
+        <Modal
+          heading="Create Server"
+          onClose={() => setIsCreateModalOpen(false)}
+        >
           <div className={styles.formWrapper}>
             <form onChange={onChange} onSubmit={onSubmit}>
               <label>id</label>
@@ -122,6 +174,41 @@ const Home = () => {
 
               <label>framework</label>
               <input name="framework" type="text" required />
+
+              <button>Submit</button>
+            </form>
+          </div>
+        </Modal>
+      ) : null}
+
+      {isEditModalOpen ? (
+        <Modal
+          heading="Create Server"
+          onClose={() => setIsEditModalOpen(false)}
+        >
+          <div className={styles.formWrapper}>
+            <form onChange={onChangeEditForm} onSubmit={onSubmitEditForm}>
+              <label>id</label>
+              <input name="id" type="text" value={dataToEdit.id} required />
+
+              <label>name</label>
+              <input name="name" type="text" value={dataToEdit.name} required />
+
+              <label>language</label>
+              <input
+                name="language"
+                type="text"
+                value={dataToEdit.language}
+                required
+              />
+
+              <label>framework</label>
+              <input
+                name="framework"
+                type="text"
+                value={dataToEdit.framework}
+                required
+              />
 
               <button>Submit</button>
             </form>
