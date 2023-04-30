@@ -16,7 +16,9 @@ const Home = () => {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const [dataToEdit, setDataToEdit] = useState(null);
+  const [searchString, setSearchString] = useState();
 
   const [loading, setLoading] = useState(false);
 
@@ -52,11 +54,11 @@ const Home = () => {
     setLoading(true);
 
     const payload = {
-        "id": dataToEdit.id,
-        "name": dataToEdit.name,
-        "language": dataToEdit.language,
-        "framework": dataToEdit.framework,
-    }
+      id: dataToEdit.id,
+      name: dataToEdit.name,
+      language: dataToEdit.language,
+      framework: dataToEdit.framework,
+    };
 
     putRequest(`http://localhost:8080/info/${dataToEdit.id}`, payload)
       .then((response) => {
@@ -65,7 +67,7 @@ const Home = () => {
       .catch((err) => console.log(err))
       .finally(() => {
         setIsEditModalOpen(false);
-        fetchServerData()
+        fetchServerData();
       });
   }
 
@@ -94,6 +96,21 @@ const Home = () => {
       });
   }
 
+  function searchRecord() {
+    setLoading(true);
+    getRequest(`http://localhost:8080/info/${searchString}`)
+      .then((response) => {
+        setServerData([response.data]);
+      })
+      .catch((err) => {
+        toast.error("No record found!");
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
   useEffect(() => {
     fetchServerData();
   }, []);
@@ -106,10 +123,27 @@ const Home = () => {
         <div className={styles.tableContainer}>
           <div className={styles.header}>
             <h2>All records</h2>
+            <div className={styles.search}>
+              <input
+                type="text"
+                value={searchString}
+                onChange={(e) => setSearchString(e.target.value)}
+              />
+              <button onClick={searchRecord}>Search</button>
+              <button
+                onClick={() => {
+                  setSearchString("");
+                  fetchServerData();
+                }}
+              >
+                Clear
+              </button>
+            </div>
             <button onClick={() => setIsCreateModalOpen(true)}>
               Create Record
             </button>
           </div>
+
           <table>
             <thead>
               <tr>

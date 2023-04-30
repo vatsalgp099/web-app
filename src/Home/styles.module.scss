@@ -19,6 +19,30 @@
             }
         }
 
+        .search {
+            display: flex;
+            align-items: center;
+            button {
+                padding: 6px 12px;
+                border-radius: 5px;
+                background-color: #146C94;
+                color: #FFFFFF;
+                &:last-child {
+                    margin-left: 6px;
+                }
+            }
+            input {
+                border: 1px solid #DBDFEA;
+                border-radius: 5px;
+                padding: 6px;
+                margin-right: 6px;
+
+                &:focus {
+                    border-color: #9BA4B5;
+                }
+            }
+        }
+
         h2 {
             margin-bottom: 8px;
         }
